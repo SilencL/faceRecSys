@@ -6,6 +6,7 @@
 '''
 import web
 import getinfo
+import time
 
 urls = (
     '/','Index'
@@ -20,13 +21,21 @@ class Index(object):
     def POST(self):
         info = web.input()
         print info
-        open('static/images/1.jpg', 'wb').write(info.get('file'))
-        return render.face('../static/images/1.jpg')
-        # if info.get('file'):
-        #     open('static/images/1.jpg', 'wb').write(info.get('file'))
-        #     return render.face1('static/images/1.jpg')
-        # else:
-        #     return getinfo.face1('http://www.litianqiang.com/static/images/qz.jpg')
+        path = info.get('path', None)
+        if path != None:
+            path = 'http://img15.3lian.com/2015/f2/94/d/44.jpg'
+            faceInfo = getinfo.face(path)
+            text = u'年龄：%s<br>性别：%s<br>微笑指数：%s<br>患病指数：20%%' %(faceInfo[1],faceInfo[0],faceInfo[2])
+
+            return text
+        else:
+            imgfile = web.input().get('file')
+            imgpath = 'static/images/%s.jpg' %time.time()
+            open(imgpath,'wb').write(imgfile)
+
+            return render.face(imgpath)
+
 
 if __name__ == '__main__':
-    web.application(urls,globals()).run()
+    app = web.application(urls,globals())
+    application = app.wsgifunc()
